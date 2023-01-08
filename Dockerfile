@@ -17,16 +17,13 @@ USER ${NB_USER}
 COPY --chown=${NB_USER}:users ./src ${mainpath}/src
 COPY --chown=${NB_USER}:users ./src/plutoserver ${mainpath}/plutoserver
 
-RUN cp ${mainpath}/src/setup.py ${mainpath}/setup.py
-RUN cp ${mainpath}/src/runpluto.sh ${mainpath}/runpluto.sh
-RUN cp ${mainpath}/src/environment.yml ${mainpath}/environment.yml
-RUN cp ${mainpath}/src/Project.toml ${mainpath}/Project.toml
+COPY src/Project.toml ${mainpath}/Project.toml
 
 ENV USER_HOME_DIR /home/${NB_USER}
 ENV JULIA_PROJECT ${USER_HOME_DIR}
 ENV JULIA_DEPOT_PATH ${USER_HOME_DIR}/.julia
 
-RUN julia --project=${mainpath} -e "import Pkg; Pkg.update(); Pkg.instantiate(); Pkg.precompile()"
+RUN julia --project=${mainpath} -e "import Pkg; Pkg.instantiate(); Pkg.precompile()"
 
 USER root
 
@@ -43,6 +40,10 @@ RUN apt-get update && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 USER ${NB_USER}
+
+COPY src/setup.py ${mainpath}/setup.py
+COPY src/runpluto.sh ${mainpath}/runpluto.sh
+COPY src/environment.yml ${mainpath}/environment.yml
 
 RUN jupyter labextension install @jupyterlab/server-proxy && \
     jupyter lab build && \

@@ -24,6 +24,7 @@ ENV JULIA_PROJECT ${USER_HOME_DIR}
 ENV JULIA_DEPOT_PATH ${USER_HOME_DIR}/.julia
 
 RUN julia --project=${mainpath} -e "import Pkg; Pkg.instantiate(); Pkg.precompile()"
+RUN julia -e "import Pkg; Pkg.add(\"IJulia\"); Pkg.precompile()"
 
 USER root
 
